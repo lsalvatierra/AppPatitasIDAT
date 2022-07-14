@@ -129,8 +129,9 @@
             android:layout_marginTop="8dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:startIconDrawable="@drawable/ic_baseline_vpn_key_24"
-            app:layout_constraintTop_toBottomOf="@+id/textInputLayout9">
+            app:layout_constraintTop_toBottomOf="@+id/textInputLayout9"
+            app:passwordToggleEnabled="true"
+            app:startIconDrawable="@drawable/ic_baseline_vpn_key_24">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/etpassreg"
@@ -149,8 +150,9 @@
             android:layout_marginTop="8dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:startIconDrawable="@drawable/ic_baseline_vpn_key_24"
-            app:layout_constraintTop_toBottomOf="@+id/textInputLayout11">
+            app:layout_constraintTop_toBottomOf="@+id/textInputLayout11"
+            app:passwordToggleEnabled="true"
+            app:startIconDrawable="@drawable/ic_baseline_vpn_key_24">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/etrepassreg"

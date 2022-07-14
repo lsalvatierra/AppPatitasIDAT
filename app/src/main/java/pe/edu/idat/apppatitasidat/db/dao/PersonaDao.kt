@@ -8,13 +8,13 @@ import pe.edu.idat.apppatitasidat.db.entity.PersonaEntity
 interface PersonaDao {
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
-    suspend fun insertar(persona: PersonaEntity)
+     fun insertar(vararg persona: PersonaEntity)
 
     @Update
-    suspend fun actualizar(persona: PersonaEntity)
+     fun actualizar(vararg persona: PersonaEntity)
 
-    @Delete
-    suspend fun eliminartodo()
+     @Query("DELETE FROM persona")
+     fun eliminartodo()
 
     @Query("SELECT * FROM persona LIMIT 1")
     fun obtener(): LiveData<PersonaEntity>

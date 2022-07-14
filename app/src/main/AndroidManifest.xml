@@ -3,6 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     package="pe.edu.idat.apppatitasidat">
 
+    <uses-permission android:name="android.permission.INTERNET"></uses-permission>
     <application
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
@@ -11,11 +12,12 @@
         android:name=".utilitarios.MiApp"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
+        android:usesCleartextTraffic="true"
         android:supportsRtl="true"
         android:theme="@style/Theme.AppPatitasIDAT"
         tools:targetApi="31">
         <activity
-            android:name=".RegistroActivity"
+            android:name=".view.RegistroActivity"
             android:exported="false" />
         <activity
             android:name=".view.SplashActivity"

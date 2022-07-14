@@ -13,7 +13,7 @@ import pe.edu.idat.apppatitasidat.utilitarios.AppMensaje
 import pe.edu.idat.apppatitasidat.utilitarios.TipoMensaje
 import pe.edu.idat.apppatitasidat.viewmodel.AuthViewModel
 
-class RegistroActivity : AppCompatActivity() {
+class RegistroActivity : AppCompatActivity(), View.OnClickListener {
 
     private lateinit var binding : ActivityRegistroBinding
     private lateinit var authViewModel: AuthViewModel
@@ -24,40 +24,22 @@ class RegistroActivity : AppCompatActivity() {
         setContentView(binding.root)
         authViewModel = ViewModelProvider(this)
             .get(AuthViewModel::class.java)
-        binding.btnregistrarme.setOnClickListener {
-            binding.btnregistrarme.isEnabled = false
-            if(validarFormulario(it)){
-                authViewModel.registrarUsuario(binding.etnomusuario.text.toString(),
-                    binding.etapeusuario.text.toString(),
-                    binding.etemailusuario.text.toString(),
-                    binding.etcelusuario.text.toString(),
-                    binding.etusureg.text.toString(),
-                    binding.etpassreg.text.toString())
-            }else{
-                binding.btnregistrarme.isEnabled = true
-            }
-        }
-        binding.btnirlogin.setOnClickListener{
-            startActivity(
-                Intent(applicationContext,
-                LoginActivity::class.java)
-            )
-        }
+        binding.btnregistrarme.setOnClickListener(this)
+        binding.btnirlogin.setOnClickListener(this)
         authViewModel.responseRegistro.observe(this, Observer {
             obtenerResultadoRegistro(it)
         })
     }
-
-    private fun obtenerResultadoRegistro(responseRegistro: ResponseRegistro) {
-        if (responseRegistro.rpta) {
+    private fun obtenerResultadoRegistro(response: ResponseRegistro) {
+        if(response.rpta){
             setearControles()
         }
         AppMensaje.enviarMensaje(binding.root,
-            responseRegistro.mensaje, TipoMensaje.ERROR)
+            response.mensaje, TipoMensaje.EXITO)
         binding.btnregistrarme.isEnabled = true
+        binding.btnirlogin.isEnabled = true
     }
 
-    //3. Método que setea los controles del formulario
     private fun setearControles() {
         binding.etnomusuario.setText("")
         binding.etapeusuario.setText("")
@@ -68,74 +50,78 @@ class RegistroActivity : AppCompatActivity() {
         binding.etrepassreg.setText("")
     }
 
-    //2. Método que valida el formulario.
-    fun validarFormulario(vista: View):Boolean{
+    override fun onClick(vista: View) {
+        when(vista.id){
+            R.id.btnregistrarme -> registrarUsuario()
+            R.id.btnirlogin-> startActivity(
+                Intent(applicationContext, LoginActivity::class.java))
+        }
+    }
+
+    private fun registrarUsuario() {
+        binding.btnregistrarme.isEnabled = false
+        binding.btnirlogin.isEnabled = false
+        if(validarFormulario()){
+            authViewModel.registrarUsuario(binding.etnomusuario.text.toString(),
+                binding.etapeusuario.text.toString(), binding.etemailusuario.text.toString(),
+                binding.etcelusuario.text.toString(), binding.etusureg.text.toString(),
+                binding.etpassreg.text.toString())
+        }else{
+            binding.btnregistrarme.isEnabled = true
+            binding.btnirlogin.isEnabled = true
+        }
+    }
+    private fun validarFormulario() : Boolean{
         var respuesta = true
-        when {
-            binding.etnomusuario.text.toString().trim().isEmpty() -> {
+        var mensaje = ""
+        when{
+            binding.etnomusuario.text.toString().trim().isEmpty() ->{
                 binding.etnomusuario.isFocusableInTouchMode = true
                 binding.etnomusuario.requestFocus()
-                AppMensaje.enviarMensaje(binding.root,
-                    "Ingrese su nombre", TipoMensaje.ERROR)
+                mensaje = "Ingrese su nombre"
                 respuesta = false
             }
-            binding.etapeusuario.text.toString().trim().isEmpty() -> {
+            binding.etapeusuario.text.toString().trim().isEmpty() ->{
                 binding.etapeusuario.isFocusableInTouchMode = true
                 binding.etapeusuario.requestFocus()
-                AppMensaje.enviarMensaje(binding.root,
-                    "Ingrese su apellido", TipoMensaje.ERROR)
+                mensaje = "Ingrese su apellido"
                 respuesta = false
             }
-            binding.etemailusuario.text.toString().trim().isEmpty() -> {
+            binding.etemailusuario.text.toString().trim().isEmpty() ->{
                 binding.etemailusuario.isFocusableInTouchMode = true
                 binding.etemailusuario.requestFocus()
-                AppMensaje.enviarMensaje(binding.root,
-                    "Ingrese su email", TipoMensaje.ERROR)
+                mensaje = "Ingrese su email"
                 respuesta = false
             }
-            /*binding.etemailusuario.text.toString().trim().isNotEmpty() -> {
-                val pattern: Pattern = Patterns.EMAIL_ADDRESS
-                if(!pattern.matcher(binding.etemailusuario.text.toString().trim()).matches())
-                {
-                    binding.etemailusuario.isFocusableInTouchMode = true
-                    binding.etemailusuario.requestFocus()
-                    AppMensaje.enviarMensaje(binding.root,
-                        "Ingrese su email correctamente", TipoMensaje.ERROR)
-                    respuesta = false
-                }
-            }*/
-            binding.etcelusuario.text.toString().trim().isEmpty() -> {
+            binding.etcelusuario.text.toString().trim().isEmpty() ->{
                 binding.etcelusuario.isFocusableInTouchMode = true
                 binding.etcelusuario.requestFocus()
-                AppMensaje.enviarMensaje(binding.root,
-                    "Ingrese su celular", TipoMensaje.ERROR)
+                mensaje = "Ingrese su celular"
                 respuesta = false
             }
-
-            binding.etusureg.text.toString().trim().isEmpty() -> {
+            binding.etusureg.text.toString().trim().isEmpty() ->{
                 binding.etusureg.isFocusableInTouchMode = true
                 binding.etusureg.requestFocus()
-                AppMensaje.enviarMensaje(binding.root,
-                    "Ingrese su usuario", TipoMensaje.ERROR)
+                mensaje = "Ingrese su cuenta de usuario"
                 respuesta = false
             }
-            binding.etpassreg.text.toString().trim().isEmpty() -> {
+            binding.etpassreg.text.toString().trim().isEmpty() ->{
                 binding.etpassreg.isFocusableInTouchMode = true
                 binding.etpassreg.requestFocus()
-                AppMensaje.enviarMensaje(binding.root,
-                    "Ingrese su password", TipoMensaje.ERROR)
+                mensaje = "Ingrese su password"
                 respuesta = false
             }
-            binding.etpassreg.text.toString().trim().isNotEmpty() -> {
+            binding.etrepassreg.text.toString().trim().isNotEmpty() ->{
                 if(binding.etpassreg.text.toString() != binding.etrepassreg.text.toString()){
                     binding.etrepassreg.isFocusableInTouchMode = true
                     binding.etrepassreg.requestFocus()
-                    AppMensaje.enviarMensaje(binding.root,
-                        "Su password no coincide", TipoMensaje.ERROR)
+                    mensaje = "Password no coincide"
                     respuesta = false
                 }
             }
         }
+        if (!respuesta) AppMensaje.enviarMensaje(binding.root, mensaje,
+            TipoMensaje.ERROR)
         return respuesta
     }
 }

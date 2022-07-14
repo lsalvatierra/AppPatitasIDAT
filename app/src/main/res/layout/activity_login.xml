@@ -43,14 +43,16 @@
         android:textColorHint="@color/color_gris_500"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:startIconDrawable="@drawable/ic_baseline_vpn_key_24"
-        app:layout_constraintTop_toBottomOf="@+id/textInputLayout">
+        app:layout_constraintTop_toBottomOf="@+id/textInputLayout"
+        app:passwordToggleEnabled="true"
+        app:startIconDrawable="@drawable/ic_baseline_vpn_key_24">
 
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/etpassword"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="@string/valetpassword" />
+            android:hint="@string/valetpassword"
+            android:inputType="textPassword" />
     </com.google.android.material.textfield.TextInputLayout>
 
     <Button

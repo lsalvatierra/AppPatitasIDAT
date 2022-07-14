@@ -18,11 +18,12 @@ import pe.edu.idat.apppatitasidat.utilitarios.TipoMensaje
 import pe.edu.idat.apppatitasidat.viewmodel.AuthViewModel
 import pe.edu.idat.apppatitasidat.viewmodel.PersonaViewModel
 
-class LoginActivity : AppCompatActivity() {
+class LoginActivity : AppCompatActivity() , View.OnClickListener  {
     private lateinit var binding : ActivityLoginBinding
-    //3.1 Definimos el viewmodel
     private lateinit var personaViewModel: PersonaViewModel
     private lateinit var authViewModel: AuthViewModel
+
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityLoginBinding.inflate(layoutInflater)
@@ -33,7 +34,7 @@ class LoginActivity : AppCompatActivity() {
         authViewModel = ViewModelProvider(this)
             .get(AuthViewModel::class.java)
         //4.1 Validamos que exista la preferencia recordardatos
-        if(verificarValorSharedPreferences()){
+        if(verificarCheckRecordarDatos()){
             //activar checkbox recordar
             binding.chkrecordar.isChecked = true
             binding.etusuario.isEnabled = false
@@ -53,49 +54,17 @@ class LoginActivity : AppCompatActivity() {
             personaViewModel.eliminartodo()
         }
         //5.1 Crear el evento click Check
-        binding.chkrecordar.setOnClickListener {
-            setearValoresDeRecordar(it)
-        }
-        binding.btnlogin.setOnClickListener {
-            validarUsuarioPassword()
-        }
-        binding.btnregistrar.setOnClickListener {
-            startActivity(
-                Intent(applicationContext,
-                RegistroActivity::class.java)
-            )
-        }
+        binding.chkrecordar.setOnClickListener(this)
+        binding.btnlogin.setOnClickListener(this)
+        binding.btnregistrar.setOnClickListener(this)
         authViewModel.responseLogin.observe(this, Observer {
-            obtenerDatosLogin(it)
+                response -> obtenerDatosLogin(response)
         })
     }
-    //5.2. Seateamos los valores cuando quitamos el check de recordar datos
-    fun setearValoresDeRecordar(view: View) {
-        if (view is CheckBox) {
-            val checked: Boolean = view.isChecked
-            when (view.id) {
-                R.id.chkrecordar -> {
-                    if(!checked){
-                        if(verificarValorSharedPreferences()){
-                            SharedPreferencesManager()
-                                .deletePreference(Constantes().PREF_RECORDAR)
-                            personaViewModel.eliminartodo()
-                            binding.etusuario.isEnabled = true
-                            binding.etpassword.isEnabled = true
-                            binding.chkrecordar.text = getString(R.string.valchkguardardatos)
-                        }
-                    }
-                }
-            }
-        }
-    }
-    //3.3 Crear método para validar los valores de SharedPreferences.
-    fun verificarValorSharedPreferences(): Boolean{
-        return SharedPreferencesManager().getSomeBooleanValue(Constantes().PREF_RECORDAR)
-    }
 
-    fun autenticarUsuario(usuario: String, password: String){
-        authViewModel.autenticarUsuario(usuario, password)
+    //3.3 Crear método para validar los valores de SharedPreferences.
+    fun verificarCheckRecordarDatos(): Boolean{
+        return SharedPreferencesManager().getSomeBooleanValue(Constantes().PREF_RECORDAR)
     }
 
     fun obtenerDatosLogin(responseLogin: ResponseLogin){
@@ -106,7 +75,7 @@ class LoginActivity : AppCompatActivity() {
                 responseLogin.apellidos, responseLogin.email, responseLogin.celular,
                 responseLogin.usuario, responseLogin.password, responseLogin.esvoluntario
             )
-            if(verificarValorSharedPreferences()){
+            if(verificarCheckRecordarDatos()){
                 personaViewModel.actualizar(personaEntity)
             }else{
                 personaViewModel.insertar(personaEntity)
@@ -119,29 +88,61 @@ class LoginActivity : AppCompatActivity() {
         }else{
             AppMensaje.enviarMensaje(binding.root, responseLogin.mensaje, TipoMensaje.ERROR)
         }
+        binding.btnregistrar.isEnabled = true
         binding.btnlogin.isEnabled = true
     }
 
-    //2. Método que valida el ingreso de usuario y password.
-    fun validarUsuarioPassword(){
-        binding.btnlogin.isEnabled = false
-        var okLogin = true
+    fun validarUsuarioPassword() : Boolean{
+        var okValidacion = true
         if(binding.etusuario.text.toString().trim().isEmpty()){
             binding.etusuario.isFocusableInTouchMode = true
             binding.etusuario.requestFocus()
-            okLogin = false
+            okValidacion = false
         } else if(binding.etpassword.text.toString().trim().isEmpty()){
             binding.etpassword.isFocusableInTouchMode = true
             binding.etpassword.requestFocus()
-            okLogin = false
+            okValidacion = false
         }
-        if(okLogin)
-            autenticarUsuario(binding.etusuario.text.toString(),
+        return okValidacion
+    }
+
+    fun autenticarUsuario(){
+        binding.btnregistrar.isEnabled = false
+        binding.btnlogin.isEnabled = false
+        if(validarUsuarioPassword()){
+            authViewModel.autenticarUsuario(binding.etusuario.text.toString(),
                 binding.etpassword.text.toString())
-        else{
-            binding.btnlogin.isEnabled = true
+        }else{
             AppMensaje.enviarMensaje(binding.root,
-                getString(R.string.msguspassword), TipoMensaje.ERROR)
+                getString(R.string.msgloginincompleto),
+                TipoMensaje.ERROR)
+            binding.btnregistrar.isEnabled = true
+            binding.btnlogin.isEnabled = true
+        }
+    }
+
+    override fun onClick(vista: View) {
+        when(vista.id){
+            R.id.btnlogin -> autenticarUsuario()
+            R.id.btnregistrar -> startActivity(Intent(applicationContext,
+                RegistroActivity::class.java))
+            R.id.chkrecordar -> setearValoresRecordar(vista)
+        }
+    }
+
+    private fun setearValoresRecordar(vista: View) {
+        if(vista is CheckBox){
+            val checked = vista.isChecked
+            if(!checked){
+                if(verificarCheckRecordarDatos()){
+                    SharedPreferencesManager().deletePreference(
+                        Constantes().PREF_RECORDAR)
+                    personaViewModel.eliminartodo()
+                    binding.etusuario.isEnabled = true
+                    binding.etpassword.isEnabled = true
+                    binding.chkrecordar.text = getString(R.string.recordarlogin)
+                }
+            }
         }
     }
 }

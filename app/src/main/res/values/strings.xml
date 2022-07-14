@@ -38,5 +38,7 @@
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="valnavlistamascotafrag">Mascotas Perdidas</string>
     <string name="valnavvoluntariofrag">Voluntario Patitas</string>
+    <string name="recordarlogin">¿Recordar datos?</string>
+    <string name="msgloginincompleto">Usuario y password son obligatorios</string>
 
 </resources>
